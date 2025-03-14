@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('username', 32)->nullable()->default('anon');
+            $table->string('username' , 32)->nullable()->default('anon');
             $table->text('content')->nullable(false);
-            $table->string('image', 255)->nullable();
+            $table->string('image' , 255)->nullable();
             $table->timestamps();
         });
     }
