@@ -12,7 +12,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        return Post::all()->reverse();
+        //desc: Maior pro Menor | asc: Menor pro Maior
+        return Post::orderBy('id', 'desc')->get();
     }
 
     /**
@@ -20,7 +21,10 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $post = new Post();
+        $post->content = $request->content;
+        $post->save();
+        return redirect('/posts');
     }
 
     /**
