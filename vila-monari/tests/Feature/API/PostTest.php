@@ -1,36 +1,71 @@
 <?php
-
 namespace Tests\Feature\API;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class PostTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
-
-     //testa a rota que mostra todos os posts
-    public function test_list_all_posts(): void
+    use RefreshDatabase;
+    public function test_list_zero_posts(): void
     {
         $response = $this->get('/api/posts');
         $response->assertStatus(200);
+        $response->assertExactJson([]);
     }
-    //testa a rota que mostra um post específico
-    public function test_show_a_single_post(): void
+
+    public function test_create_post(): void
     {
-        $response = $this->get('/api/posts/40');
+        $requestBody = [
+            'content' => 'Post de feito por Felipe Eduardo Monari!',
+        ];
+
+        $response = $this->post('/api/posts', $requestBody);
+
+        $response->assertStatus(201);
+
+        $responseBody = $response->json();
+        $this->assertIsInt($responseBody['id']);
+        $this->assertLessThanOrEqual(32, strlen($responseBody['id']));
+        $this->assertLessThan(255, strlen($responseBody['image']));
+
+        $response->assertSimilarJson([
+            'id'         => $responseBody['id'],
+            'content'    => $requestBody['content'],
+            'created_at' => $responseBody['created_at'],
+            'updated_at' => $responseBody['updated_at'],
+        ]);
+
+        $response = $this->get("/api/posts/{$responseBody['id']}");
         $response->assertStatus(200);
+        $response->assertExactJson([
+            'id'         => $responseBody['id'],
+            'username'   => 'anon',
+            'content'    => $requestBody['content'],
+            'image'      => null,
+            'created_at' => $responseBody['created_at'],
+            'updated_at' => $responseBody['updated_at'],
+        ]);
     }
-    public function test_post_must_not_exists(): void
+
+    public function test_update_single_post(): void
     {
-        $response1 = $this->get('/api/posts/0');
-        $response1->assertStatus(404);
+        $post = Post::factory()->create();
 
+        $post = [
+            'content' => 'Post de feito por Felipe Eduardo Monari!',
+        ];
 
-        $response2 = $this->get('/api/posts/a');
-        $response2->assertStatus(404);
+        $response = $this->put("/api/posts/{$post->id}", $requestBody);
+
+        $response->assertStatus(200);
+        $response->assertExactJson([
+            'id'         => $post->id,
+            'username'   => 'anon',
+            'content'    => $requestBody['content'],
+            'image'      => null,
+            'created_at' => $post->created_at,
+            'updated_at' => now(),
+        ]);
     }
 }
