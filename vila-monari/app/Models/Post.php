@@ -20,4 +20,9 @@ class Post extends Model
         'content',
         'image',
     ];
+
+//    public function image()
+//    {
+//
+//    }
 }

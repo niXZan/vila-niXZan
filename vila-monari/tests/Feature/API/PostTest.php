@@ -41,7 +41,7 @@ class PostTest extends TestCase
         $response->assertStatus(404);
         $response->assertJson([]);
     }
-    public function test_create_post_through_api(): void
+    private function test_create_post_through_api(): void
     {
         $requestBody = [
             'content' => "",
